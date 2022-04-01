@@ -86,4 +86,83 @@ capture('/Users/jangsujeong/Downloads/mask_project/nonMask', 300)
 
 capture('/Users/jangsujeong/Downloads/mask_project/Mask', 300)
 
+# # 이미지 전처리
+
+import os
+
+non_list = os.listdir('/Users/jangsujeong/Downloads/mask_project/nonMask')
+print(non_list)
+
+yes_list = os.listdir('/Users/jangsujeong/Downloads/mask_project/Mask')
+print(yes_list)
+
+image = cv2.imread('/Users/jangsujeong/Downloads/mask_project/nonMask/nonMask85.jpg')
+
+for i in non_list:
+    image =  cv2.imread('/Users/jangsujeong/Downloads/mask_project/nonMask/' + i)
+
+# +
+w = []
+h = []
+
+for i in non_list:
+    image = cv2.imread('/Users/jangsujeong/Downloads/mask_project/nonMask/' + i)
+    h.append(image.shape[0])
+    w.append(image.shape[1])
+# -
+
+for i in yes_list:
+    image = cv2.imread('/Users/jangsujeong/Downloads/mask_project/Mask/' + i)
+    h.append(image.shape[0])
+    w.append(image.shape[1])
+
+# +
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(10,5))
+plt.scatter(w,h,alpha=0.5)#산점도로 표시
+
+# +
+import cv2
+import cvlib
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+import pandas as pd
+import seaborn as sns
+from IPython.display import Image
+from sklearn.metrics import confusion_matrix
+from tensorflow.keras.preprocessing.image import array_to_img, load_img, img_to_array
+from tensorflow.keras.layers import Conv2D, MaxPool2D, Dense, Flatten, Dropout
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.models import load_model
+
+img_w, img_h = 140, 180
+images = [] #실제 데이터 
+labels = [] #정답 데이터(1,0으로 분류)
+
+for i in non_list:
+    image = load_img('/Users/jangsujeong/Downloads/mask_project/nonMask/' + i, target_size=(img_w, img_h))#임시값
+    image = img_to_array(image)
+    images.append(image)
+    labels.append(0)#마스크 쓰지 않았으므로 0
+    
+for i in yes_list:
+    image = load_img('/Users/jangsujeong/Downloads/mask_project/Mask/' + i, target_size=(img_w, img_h))
+    image = img_to_array(image)
+    images.append(image)
+    labels.append(1)#마스크 썼기 때문에 1
+
+images[0].shape
+# -
+
+from sklearn.model_selection import train_test_split
+import numpy as np
+
+
+x_train, x_test, y_train, y_test = train_test_split(np.array(images), np.array(labels), test_size=0.1)
+x_train, x_val, y_train, y_val = train_test_split(x_train, y_train, test_size=0.1)
+
+y_test
+
 
