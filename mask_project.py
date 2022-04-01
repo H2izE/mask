@@ -41,6 +41,7 @@ if not webcam.isOpened():
 
 #프레임 받아오기
 ret, frame = webcam.read() #2개의 리턴값을 튜플로 반환함.
+print(frame)
 if not ret:
     raise Exception("캡쳐가 없음")
 
@@ -48,7 +49,41 @@ faces, confidences = cv.detect_face(frame) #이미지에서 얼굴 위치, 얼�
 print(faces[0])#좌표 4지점 
 print(confidences)
 
-# 이미지 저장하기
-start_x, start_y, end_x, end_y = faces
+start_x, start_y, end_x, end_y = faces[0]
+cv2.imwrite('1.jpg', frame[start_y:end_y, start_x:end_x, :])
+
+# +
+import time
+
+def capture(path, m=1):
+    count = 0
+    
+    webcam = cv2.VideoCapture(0)
+    if not webcam.isOpened():
+        raise Exception("카메라 읎음")
+    
+    while count < m:
+        time.sleep(0.3) 
+        ret, frame = webcam.read() #2개의 리턴값을 튜플로 반환함.
+        if not ret:
+            raise Exception("캡쳐가 없음")
+            
+        faces, confidences = cv.detect_face(frame) 
+        
+        for face, conf in zip(faces, confidences):
+            if conf < 0.8:
+                continue
+            start_x, start_y, end_x, end_y = faces[0]
+            cv2.imwrite(path+str(count)+'.jpg', frame[start_y:end_y, start_x:end_x, :])
+            count += 1
+            print(count,'장')
+    print(count, end='')
+    webcam.release()
+
+capture('/Users/jangsujeong/Downloads/mask_project/nonMask', 300)
+
+# -
+
+capture('/Users/jangsujeong/Downloads/mask_project/Mask', 300)
 
 
