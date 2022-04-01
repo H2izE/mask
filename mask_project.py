@@ -165,4 +165,67 @@ x_train, x_val, y_train, y_val = train_test_split(x_train, y_train, test_size=0.
 
 y_test
 
+# # 딥러닝 모델 구축
+
+model = Sequential()
+model.add(Conv2D(32, kernel_size=(3, 3), input_shape=(img_w, img_h, 3), activation='relu'))
+model.add(Conv2D(64, (3, 3), activation='relu'))
+model.add(MaxPool2D(pool_size=2))
+model.add(Dropout(0.25))
+model.add(Flatten())
+model.add(Dense(128, activation='relu'))
+model.add(Dropout(0.5))
+model.add(Dense(10, activation='softmax'))
+
+model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+
+history = model.fit(x_train, y_train, validation_data=(x_val, y_val), epochs=20)
+
+# +
+accuracy = history.history['accuracy']
+val_accuracy = history.history['val_accuracy']
+
+loss = history.history['loss']
+val_loss = history.history['val_loss']
+
+epoch_range = range(20)
+
+plt.figure(figsize=(16,8))
+plt.subplot(1,2,1)
+plt.plot(epoch_range, accuracy, label='Training Accuaracy')
+plt.plot(epoch_range, val_accuracy, label='Validation Accuaracy')
+plt.legend(loc='lower right')
+plt.title('Training and Validation Accuracy')
+
+plt.subplot(1,2,2)
+plt.plot(epoch_range, loss, label='Training Loss')
+plt.plot(epoch_range, val_loss, label='Validation Loss')
+plt.legend(loc='upper right')
+plt.title('Training and Validation Loss')
+plt.show()
+
+
+
+# +
+test_loss, test_accuracy = model.evaluate(x_test, y_test, verbose=0)
+test_prediction = np.argmax(model.predict(x_test), axis=-1)
+plt.figure(figsize=(13,13))
+
+s = 0
+for i in range(25):
+    plt.subplot(5,5,i+1)
+    plt.grid(False)
+    plt.xticks([])
+    plt.yticks([])
+    prediction = test_prediction[s+i]
+    actual = y_test[s+i]
+    col = 'g'
+    if prediction!=actual:
+        col='r'
+    plt.xlabel('Actual={} || Pred={}'.format(actual, prediction), color=col)
+    plt.imshow(array_to_img(x_test[s+i]))
+
+plt.show()
+# -
+
 
